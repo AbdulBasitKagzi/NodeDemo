@@ -27,12 +27,33 @@ const medicalSchema = mongoose.Schema({
   },
 });
 
+medicalSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
+  delete userObject.password;
+  delete userObject._id;
+  delete userObject.firstname, delete userObject.lastname;
+  return userObject;
+};
 // medicalSchema.methods.toJSON = function () {
 //   const user = this;
 //   const userObject = user.toObject();
 //   delete userObject.password;
 //   delete userObject._id;
+//   // delete UserObject.firstname,
+//   // delete UserObject.lastname,
 
+//   return userObject;
+// };
+
+// medicalSchema.methods.toJSON = function () {
+//   const user = this;
+//   const userObject = user.toObject();
+
+//   delete userObject.password;
+//   delete userObject.tokens;
+//   delete userObject.createdAt;
+//   delete userObject.updatedAt;
 //   return userObject;
 // };
 

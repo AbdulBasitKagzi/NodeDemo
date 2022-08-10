@@ -1,7 +1,7 @@
 // imports
 const express = require("express");
 const Producttype = require("../model/productType");
-
+const Product = require("../model/products");
 const {
   registerUser,
   loginUser,
@@ -105,7 +105,10 @@ routes.get("/getall", fetchUsers, async (req, res) => {
   //const id = req.params.id;
   //console.log("id", id);
   console.log("hello", user);
-  const poducts = await Producttype.find({ owner: user._id }).populate("owner");
+  const poducts = await Product.find(
+    { owner: user._id },
+    { productname: 1 }
+  ).populate("owner");
   return res.status(200).json(poducts);
 });
 

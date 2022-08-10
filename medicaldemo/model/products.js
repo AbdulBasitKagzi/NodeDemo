@@ -17,5 +17,16 @@ const product = mongoose.Schema({
     ref: "User",
   },
 });
+// product.methods.toJSON = function () {
+//   const user = this;
+//   const userObject = user.toObject();
+
+//   delete userObject.password;
+//   delete userObject._id;
+//   //   delete userObject.tokens;
+//   //   delete userObject.createdAt;
+//   //   delete userObject.updatedAt;
+//   return userObject;
+// };
 const Product = mongoose.model("product", product);
 module.exports = Product;
