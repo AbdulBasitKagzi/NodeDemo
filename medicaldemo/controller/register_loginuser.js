@@ -1,6 +1,7 @@
 const MedUsers = require("../model/medicalusers");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+
 const fetchUsers = require("../middleware/fetch");
 
 const secret_key = "abdulbasitkagzi";

@@ -1,4 +1,4 @@
-const Producttype = require("../model/product");
+const Producttype = require("../model/productType");
 
 // function to register product
 async function registerProduct(req, res) {

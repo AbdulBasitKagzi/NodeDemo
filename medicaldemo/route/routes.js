@@ -1,12 +1,12 @@
 // imports
 const express = require("express");
-const Producttype = require("../model/product");
+const Producttype = require("../model/productType");
 
 const {
   registerUser,
   loginUser,
   getUsers,
-} = require("../controller/registeruser");
+} = require("../controller/register_loginuser");
 const registerProduct = require("../controller/registerProducts");
 const fetchUsers = require("../middleware/fetch");
 const getRecentProds = require("../controller/getRecent");
