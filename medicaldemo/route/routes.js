@@ -8,11 +8,12 @@ const {
   getUsers,
 } = require("../controller/register_loginuser");
 const registerProduct = require("../controller/registerProducts");
+const enterproduct = require("../controller/enterproduct");
 const fetchUsers = require("../middleware/fetch");
 const getRecentProds = require("../controller/getRecent");
 const getMostlike = require("../controller/getMostlike");
 
-// setting up router
+// setting  up router
 const routes = express.Router();
 
 // setting up request
@@ -126,5 +127,7 @@ routes.get("/medicalproduct", async (req, res) => {
     return res.status(400).json({ error: "Can't get the data 😓" });
   }
 });
+
+routes.post("/enter", fetchUsers, enterproduct);
 // exporting routes
 module.exports = routes;

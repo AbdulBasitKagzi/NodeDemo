@@ -1,8 +1,9 @@
 const Producttype = require("../model/productType");
+const Product = require("../model/products");
 
 async function getRecentProds(req, res) {
   try {
-    const recentProds = await Producttype.find({}).sort({ _id: -1 });
+    const recentProds = await Product.find({}).sort({ _id: -1 });
     console.log("recent", recentProds);
     return await res.status(201).json(recentProds);
   } catch (error) {
