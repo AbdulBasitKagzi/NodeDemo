@@ -7,8 +7,20 @@ const product = mongoose.Schema({
     unique: [true, "This product is already there"],
   },
   type: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.String,
     ref: "producttype",
+  },
+  expire: {
+    type: Date,
+    default:
+      Date.now() + 1000 /*sec*/ * 60 /*min*/ * 60 /*hour*/ * 24 /*day*/ * 10,
+    // Date.now() + 1000 /*sec*/ * 60 /*min*/ * 60 /*hour*/ * 24 /*day*/ * 10,
+  },
+  pID: {
+    type: mongoose.Schema.Types.ObjectId,
+  },
+  comment: {
+    type: String,
   },
 
   owner: {

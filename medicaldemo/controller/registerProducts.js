@@ -25,4 +25,15 @@ async function registerProduct(req, res) {
   }
 }
 
-module.exports = registerProduct;
+// get all product types
+async function getallproducttype(req, res) {
+  try {
+    const products = await Producttype.find();
+    return await res.status(200).json(products);
+  } catch (error) {
+    console.log("findingerror", error);
+    return await res.status(200).json({ error: "Can't get the products 😒" });
+  }
+}
+
+module.exports = { registerProduct, getallproducttype };

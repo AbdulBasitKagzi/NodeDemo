@@ -7,11 +7,22 @@ const {
   loginUser,
   getUsers,
 } = require("../controller/register_loginuser");
-const registerProduct = require("../controller/registerProducts");
-const enterproduct = require("../controller/enterproduct");
+const {
+  registerProduct,
+  getallproducttype,
+} = require("../controller/registerProducts");
+const {
+  enterProduct,
+  getmedicalproduct,
+  getmedicalproductbytype,
+  editmedicalproduct,
+  addcomment,
+  deletemedicalproduct,
+  getRecentProds,
+} = require("../controller/enterproduct");
 const fetchUsers = require("../middleware/fetch");
-const getRecentProds = require("../controller/getRecent");
-const getMostlike = require("../controller/getMostlike");
+
+const { getlike, getMostlike } = require("../controller/like_dislike");
 
 // setting  up router
 const routes = express.Router();
@@ -21,116 +32,149 @@ routes.get("/", (req, res) => {
   res.send(`Server is there :) 😊`);
 });
 
-// get request for products
-routes.get("/getproducts/:type", async (req, res) => {
-  // const type = req.params.type;
-  // console.log("type", type);
-  try {
-    const products = await Producttype.find({ type: req.params.type });
-    return await res.status(200).json(products);
-  } catch (error) {
-    console.log("findingerror", error);
-    return await res.status(200).json({ error: "Can't get the products 😒" });
-  }
-});
+// const type = req.params.type;
+// console.log("type", type);
+// try {
+//   const products = await Producttype.find();
+//   return await res.status(200).json(products);
+// } catch (error) {
+//   console.log("findingerror", error);
+//   return await res.status(200).json({ error: "Can't get the products 😒" });
+// }
+// });
+
+// sign up
 routes.post("/signup", registerUser);
+
+// login
 routes.post("/login", loginUser);
+
+// get user login
 routes.post("/getUser", fetchUsers, getUsers);
+
+// get request for products
+routes.get("/getallproducttype", getallproducttype);
+
+// get registered products
 routes.post("/registerproduct", fetchUsers, registerProduct);
 
-// update request for product
-routes.patch("/updatecomment/:id", fetchUsers, async (req, res) => {
-  const id = req.params.id;
-  const { comment } = req.body;
-  const { productname } = req.body;
-  const { like } = req.body;
-  console.log("req", req.body);
+// edit medical product
+routes.patch("/editmedicalproduct/:id", fetchUsers, editmedicalproduct);
 
-  const prodarray = await Producttype.findById(id, {
-    _id: 0,
-    comment: 0,
-    __v: 0,
-    type: 0,
-    like: 0,
-  });
-  let valid = true;
-  console.log("product", productname);
-  prodarray.productname.forEach((element) => {
-    console.log("ele", element);
-    if (element == productname) {
-      valid = false;
-    }
-  });
+// add comment
+routes.patch("/addcomment/:id", fetchUsers, addcomment);
 
-  try {
-    if (valid) {
-      const newprod = await Producttype.findByIdAndUpdate(
-        id,
-
-        {
-          comment,
-          like,
-          $push: {
-            productname,
-          },
-        },
-
-        { new: true }
-      );
-      return await res.status(200).json(newprod);
-    } else {
-      return await res.status(400).json({ message: "Product already exist" });
-    }
-  } catch (error) {
-    console.log("updateerror", error);
-    return await res.status(400).json({ error: "Update failed" });
-  }
-});
-
-// delete any product
-routes.delete("/deleteproduct/:type", fetchUsers, async (req, res) => {
-  const type = req.params.type;
-  console.log("type", type);
-  try {
-    const products = await Producttype.deleteOne({ type: req.params.type });
-    return await res.status(200).json(products);
-  } catch (error) {
-    console.log("deleterror", error);
-    return await res.status(400).json({ error: "Can't delete 😒" });
-  }
-});
+// delete medicalproduct
+routes.delete("/delete/:id", fetchUsers, deletemedicalproduct);
 
 // practicing populate()
 routes.get("/getall", fetchUsers, async (req, res) => {
   //const id = req.params.id;
   //console.log("id", id);
   console.log("hello", user);
-  const poducts = await Product.find(
-    { owner: user._id },
-    { productname: 1 }
-  ).populate("owner");
-  return res.status(200).json(poducts);
+  try {
+    const poducts = await Product.find(
+      { owner: user._id },
+      { productname: 1, type: 1 }
+    ).populate("owner");
+    if (poducts !== Null) {
+      return res.status(200).json(poducts);
+    } else {
+      return res.status(400).send("This user don't have any product");
+    }
+  } catch (error) {
+    return res.status(400).send("This user don't have any product");
+  }
 });
 
 // get recent products
 routes.get("/recent", getRecentProds);
 
-// get mostliked product
-routes.get("/mostlike", getMostlike);
+// get liked and dislike product
+routes.post("/like/:id", fetchUsers, getlike);
+
+// get mostlike
+routes.get("/mostlike/:id", getMostlike);
+
+// get medical product
+routes.get("/getmedicalproduct", getmedicalproduct);
 
 // get medical product by product types
-routes.get("/medicalproduct", async (req, res) => {
-  try {
-    const medproducts = await Producttype.find(
-      { type: "Medical" },
-      { productname: 1 }
-    );
-    return res.status(200).json(medproducts);
-  } catch (error) {
-    return res.status(400).json({ error: "Can't get the data 😓" });
-  }
-});
+routes.get("/getmedicalproductbytype", getmedicalproductbytype);
 
-routes.post("/enter", fetchUsers, enterproduct);
+// update request for product
+// routes.patch("/updatecomment/:id", fetchUsers, async (req, res) => {
+//   const id = req.params.id;
+//   const { comment } = req.body;
+//   const { productname } = req.body;
+//   const { like } = req.body;
+//   console.log("req", req.body);
+
+//   const prodarray = await Producttype.findById(id, {
+//     _id: 0,
+//     comment: 0,
+//     __v: 0,
+//     type: 0,
+//     like: 0,
+//   });
+//   let valid = true;
+//   console.log("product", productname);
+//   prodarray.productname.forEach((element) => {
+//     console.log("ele", element);
+//     if (element == productname) {
+//       valid = false;
+//     }
+//   });
+
+//   try {
+//     if (valid) {
+//       const newprod = await Producttype.findByIdAndUpdate(
+//         id,
+
+//         {
+//           comment,
+//           like,
+//           $push: {
+//             productname,
+//           },
+//         },
+
+//         { new: true }
+//       );
+//       return await res.status(200).json(newprod);
+//     } else {
+//       return await res.status(400).json({ message: "Product already exist" });
+//     }
+//   } catch (error) {
+//     console.log("updateerror", error);
+//     return await res.status(400).json({ error: "Update failed" });
+//   }
+// });
+
+// // delete any product
+// routes.delete("/deleteproduct/:type", fetchUsers, async (req, res) => {
+//   const type = req.params.type;
+//   console.log("type", type);
+//   try {
+//     const products = await Producttype.deleteOne({ type: req.params.type });
+//     return await res.status(200).json(products);
+//   } catch (error) {
+//     console.log("deleterror", error);
+//     return await res.status(400).json({ error: "Can't delete 😒" });
+//   }
+// });
+
+//     const medproducts = await Product.find(
+//       { id: ObjectId },
+//       { productname: 1, type: 1 }
+//     );
+//     return res.status(200).json(medproducts);
+//   } catch (error) {
+//     console.log("getdta", error);
+//     return res.status(400).json({ error: "Can't get the data 😓" });
+//   }
+// });
+
+routes.post("/enter", fetchUsers, enterProduct);
 // exporting routes
 module.exports = routes;
