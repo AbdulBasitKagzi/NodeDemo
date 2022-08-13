@@ -10,7 +10,7 @@ const likeSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "product",
-  },    
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
