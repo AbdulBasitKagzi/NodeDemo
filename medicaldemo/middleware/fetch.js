@@ -8,7 +8,7 @@ async function fetchUsers(req, res, next) {
   const token = req.header("Authorization").replace("Bearer ", "");
   console.log("token1", token);
   if (!token) {
-    res.status(401).json({ error: "Didn't get the token" });
+    res.status(401).send("Please login to do the changes");
   }
 
   try {

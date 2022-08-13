@@ -6,33 +6,95 @@ const fetchUsers = require("../middleware/fetch");
 
 const secret_key = "abdulbasitkagzi";
 
+// handle errors
+const handleError = (err) => {
+  console.log(err.message);
+  let error = {
+    email: "",
+  };
+  if (err.code === 11000) {
+    error.email = "This email is already registered";
+    return error;
+  }
+  // if (err.message.includes("User validation failed")) {
+  //   // console.log("validaton", err);
+  //   Object.values(err.errors).forEach(({ properties }) => {
+  //     error[properties.path] = properties.message;
+  //     console.log("hello", properties);
+  //   });
+  // }
+  // return error;
+};
 // function for registering user
 async function registerUser(req, res) {
-  const { firstname, lastname, email } = req.body;
-
+  const { firstname, lastname, email, password } = req.body;
   // creating a hash password
-  const securePass = await bcrypt.hash(req.body.password, 10);
-  console.log("secure", securePass);
-  try {
-    const meduser = await MedUsers.create({
-      firstname,
-      lastname,
-      email,
-      password: securePass,
-    });
-    const token = await jwt.sign(meduser.id, secret_key);
 
-    console.log("token", token);
-    return await res.status(201).json({ meduser, token });
-  } catch (error) {
-    console.log("signup", error);
-    res.status(400).json({ error: "Email is already registered" });
+  // console.log("secure", securePass);
+
+  try {
+    // if (error) {
+    //   return res
+    //     .status(400)
+    //     .send("Please enter firstname, lastname, email, password");
+    // }
+    if (
+      firstname === "" &&
+      lastname === "" &&
+      email === "" &&
+      password === ""
+    ) {
+      return res
+        .status(400)
+        .send("Please enter firstname, lastname, email, password");
+    } else if (lastname === "" && email === "" && password === "") {
+      return res.status(400).send("Please enter lastname, email, password");
+    } else if (email === "" && password === "") {
+      return res.status(400).send("Please enter  email, password");
+    } else if (email === "") {
+      return res.status(400).send("Please enter  email");
+    } else if (password === "") {
+      return res.status(400).send("Please enter password");
+    } else {
+      // const securePass = await bcrypt.hash(req.body.password, 10);
+      const meduser = await MedUsers.create({
+        firstname,
+        lastname,
+        email,
+        password,
+      });
+
+      const token = jwt.sign(meduser.id, secret_key);
+
+      console.log("token", token);
+      return await res.status(201).json({ meduser, token });
+    }
+  } catch (err) {
+    // console.log("error", err);
+    if (err.code === 11000) {
+      const error = handleError(err);
+      Object.values(error).forEach((ele) => {
+        return res.status(400).send(ele);
+      });
+    } else {
+      return res.status(400).send("Enter valid email");
+    }
+
+    // console.log("signup", err);
   }
 }
 // function to loguser
 async function loginUser(req, res) {
   const { email, password } = req.body;
 
+  // doing validation
+  if (email === "" && password === "") {
+    return res.status(401).send("Enter email and password");
+  } else if (email === "") {
+    return res.status(401).send("Enter email");
+  } else if (password === "") {
+    return res.status(401).send("Enter password");
+  }
   try {
     const user = await MedUsers.findOne(
       { email },
@@ -48,7 +110,7 @@ async function loginUser(req, res) {
 
     if (user.email === email && comparepass) {
       // console.log(!comparepass);
-      const token = await jwt.sign(user.id, secret_key);
+      const token = jwt.sign(user.id, secret_key);
       return res.status(201).json({ success, token });
     } else if (!comparepass) {
       return res.status(400).send("Password is incorrect");

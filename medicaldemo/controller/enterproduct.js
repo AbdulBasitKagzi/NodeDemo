@@ -22,30 +22,38 @@ var ObjectId = require("mongodb").ObjectID;
 // to enter product by product type
 async function enterProduct(req, res) {
   const { productname, type, pID, expire } = req.body;
-  try {
-    const addProduct = await Product.create({
-      pID,
-      productname,
-      type,
-      expire,
-      owner: user._id,
-    });
-    return await res.status(200).json(addProduct);
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(400)
-      .json({ error: "This product name is already there" });
+  if (
+    type == "Medical" ||
+    type == "Mechanical" ||
+    type == "Electrical" ||
+    type == "Electronics"
+  ) {
+    if (productname !== "") {
+      try {
+        const addProduct = await Product.create({
+          pID,
+          productname,
+          type,
+          expire,
+          owner: user._id,
+        });
+        return await res.status(200).json(addProduct);
+      } catch (error) {
+        // console.log(error);
+        return res.status(400).send("This product is already there");
+      }
+    } else {
+      return res.status(400).send("Enter product name ");
+    }
+  } else {
+    return res.status(400).send("Enter correct product type");
   }
 }
 
 // to get only medical product
 async function getmedicalproduct(req, res) {
   try {
-    const medproducts = await Product.find(
-      { id: ObjectId, type: "Medical" },
-      { productname: 1, type: 1 }
-    );
+    const medproducts = await Product.find({ id: ObjectId, type: "Medical" });
     return res.status(200).json(medproducts);
   } catch (error) {
     console.log("getdta", error);
@@ -57,7 +65,7 @@ async function getmedicalproduct(req, res) {
 async function getmedicalproductbytype(req, res) {
   try {
     const medproducts = await Product.find(
-      { type },
+      { type: "Medical" },
       { productname: 1, type: 1 }
     );
     return res.status(200).json(medproducts);
@@ -71,21 +79,28 @@ async function getmedicalproductbytype(req, res) {
 async function editmedicalproduct(req, res) {
   const id = req.params.id;
   const { productname } = req.body;
-  const findowner = await Product.findOne({ _id: id }, { _id: 0, owner: 1 });
-  // console.log("owner", JSON.stringify(findowner));
-  // console.log("user", JSON.stringify(user._id));
-  if (JSON.stringify(findowner.owner) === JSON.stringify(user._id)) {
-    const newprod = await Product.findByIdAndUpdate(
-      { _id: id },
-      {
-        productname,
-      },
-      { new: true }
-    );
-    return res.status(200).json(newprod);
-  } else {
-    console.log("Your are not eligible to edit");
-    return res.status(400).send("You are not eligible to edit 🤣");
+  try {
+    if (productname === "") {
+      return res.status(400).send("Enter the product name to update");
+    }
+    const findowner = await Product.findOne({ _id: id }, { _id: 0, owner: 1 });
+    // console.log("owner", JSON.stringify(findowner));
+    // console.log("user", JSON.stringify(user._id));
+    if (JSON.stringify(findowner.owner) === JSON.stringify(user._id)) {
+      const newprod = await Product.findByIdAndUpdate(
+        { _id: id },
+        {
+          productname,
+        },
+        { new: true }
+      );
+      return res.status(200).json(newprod);
+    } else {
+      // console.log("Your are not eligible to edit");
+      return res.status(400).send("You are not eligible to edit 🤣");
+    }
+  } catch (error) {
+    return res.status(400).send("Correct product id is required");
   }
 }
 
@@ -93,22 +108,30 @@ async function editmedicalproduct(req, res) {
 async function addcomment(req, res) {
   const id = req.params.id;
   const { comment } = req.body;
-  const findowner = await Product.findOne({ _id: id }, { _id: 0, owner: 1 });
-  // console.log("owner", JSON.stringify(findowner));
-  // console.log("user", JSON.stringify(user._id));
-  if (JSON.stringify(findowner.owner) === JSON.stringify(user._id)) {
-    const newprod = await Product.findByIdAndUpdate(
-      { _id: id },
-      {
-        comment,
-      },
-      { new: true }
-    );
-    console.log("comm", newprod.comment);
-    return res.status(200).json(newprod);
-  } else {
-    console.log("Your are not eligible to edit");
-    return res.status(400).send("You are not eligible to comment 🤣");
+  try {
+    if (comment === "") {
+      return res.status(400).send("Enter the comment to add");
+    }
+    const findowner = await Product.findOne({ _id: id }, { _id: 0, owner: 1 });
+    // console.log("owner", JSON.stringify(findowner));
+    // console.log("user", JSON.stringify(user._id));
+
+    if (JSON.stringify(findowner.owner) === JSON.stringify(user._id)) {
+      const newprod = await Product.findByIdAndUpdate(
+        { _id: id },
+        {
+          comment,
+        },
+        { new: true }
+      );
+      console.log("comm", newprod.comment);
+      return res.status(200).json(newprod);
+    } else {
+      // console.log("Your are not eligible to edit");
+      return res.status(400).send("You are not eligible to comment 🤣");
+    }
+  } catch (error) {
+    return res.status(400).send("Correct product id is required");
   }
 }
 
@@ -120,21 +143,25 @@ async function deletemedicalproduct(req, res) {
     { _id: id },
     { _id: 0, owner: 1, type: 1 }
   );
-  console.log("owner", JSON.stringify(findowner.type));
-  // console.log("user", JSON.stringify(user._id));
-  if (JSON.stringify(findowner.owner) === JSON.stringify(user._id)) {
-    if (findowner.type === "Medical") {
-      console.log("Eligible to delete");
-      const newprod = await Product.deleteOne({ _id: id });
-      return res.status(200).json(newprod);
+  try {
+    if (JSON.stringify(findowner.owner) === JSON.stringify(user._id)) {
+      if (findowner.type === "Medical") {
+        // console.log("Eligible to delete");
+        const newprod = await Product.deleteOne({ _id: id });
+        return res.status(200).json(newprod);
+      } else {
+        console.log("You can't delete this product");
+        return res.status(200).send("This product can't be deleted 🙍‍♂️");
+      }
     } else {
-      console.log("You can't delete this product");
-      return res.status(200).send("This product can't be deleted 🙍‍♂️");
+      // console.log("Your are not eligible to edit");
+      return res.status(400).send("You are not eligible to delete 🤣");
     }
-  } else {
-    console.log("Your are not eligible to edit");
-    return res.status(400).send("You are not eligible to delete 🤣");
+  } catch (error) {
+    return res.status(400).send("Product is already deleted");
   }
+  // console.log("owner", JSON.stringify(findowner.type));
+  // console.log("user", JSON.stringify(user._id));
 }
 
 // to get recent products
