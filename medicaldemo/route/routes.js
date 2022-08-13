@@ -73,16 +73,17 @@ routes.get("/getall", fetchUsers, async (req, res) => {
   //console.log("id", id);
   console.log("hello", user);
   try {
-    const poducts = await Product.find(
+    const products = await Product.find(
       { owner: user._id },
       { productname: 1, type: 1 }
     ).populate("owner");
-    if (poducts !== Null) {
-      return res.status(200).json(poducts);
+    if (products !== "") {
+      return res.status(200).json(products);
     } else {
       return res.status(400).send("This user don't have any product");
     }
   } catch (error) {
+    console.log("err", error);
     return res.status(400).send("This user don't have any product");
   }
 });
@@ -94,7 +95,7 @@ routes.get("/recent", getRecentProds);
 routes.post("/like/:id", fetchUsers, getlike);
 
 // get mostlike
-routes.get("/mostlike/:id", getMostlike);
+routes.get("/mostlike", fetchUsers, getMostlike);
 
 // get medical product
 routes.get("/getmedicalproduct", getmedicalproduct);

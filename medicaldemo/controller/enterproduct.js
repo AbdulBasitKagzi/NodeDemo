@@ -104,6 +104,7 @@ async function addcomment(req, res) {
       },
       { new: true }
     );
+    console.log("comm", newprod.comment);
     return res.status(200).json(newprod);
   } else {
     console.log("Your are not eligible to edit");
