@@ -22,23 +22,11 @@ async function getlike(req, res) {
     }
     const addlike = new Like({ productId: id, owner: user._id });
     await addlike.save();
-    // const addlike = await Like.create({
-    //   like_dislike,
-    //   productId,
-    //   owner: user._id,
-    // });
-    return res.status(200).send("Liked");
 
-    //   const addlike = new Like({ productId: _id, owner: user._id });
-    //   await addlike.create({
-    //     like_dislike: req.params.body,
-    //     productId: req.params.body,
-    //     owner: user_.id,
-    //   });
-    //   res.status(201).send("Liked ! ");
+    return res.status(200).send("Liked");
   } catch (error) {
     console.log(error);
-    res.status(500).send(error);
+    return res.status(500).send(error);
   }
 }
 

@@ -25,19 +25,41 @@ const handleError = (err) => {
   // }
   // return error;
 };
+
+// function for errors
+// async function validerrors(firstname, lastname, email, password) {
+//   if (firstname === "" && lastname === "" && email === "" && password === "") {
+//     return "Please enter firstname, lastname, email, password";
+//   } else if (firstname === "" && email === "" && password === "") {
+//     return "Please enter firstname email, password";
+//   } else if (lastname === "" && email === "" && password === "") {
+//     return "Please enter lastname,email, password";
+//   } else if (lastname === "" && email === "") {
+//     return "Please enter lastname,email";
+//   } else if (email === "" && password === "") {
+//     return "Please enter  email, pssword";
+//   } else if (email === "") {
+//     return "Please enter  email";
+//   } else if (password === "") {
+//     return "Please enter password";
+//   } else if (firstname === "") {
+//     return "Please enter firstname";
+//   } else if (lastname === "") {
+//     return "Please enter lastname";
+//   }
+// }
+
 // function for registering user
 async function registerUser(req, res) {
   const { firstname, lastname, email, password } = req.body;
-  // creating a hash password
 
+  // creating a hash password
   // console.log("secure", securePass);
 
+  // return res
+  //   .status(400)
+  //   .send(validerrors(firstname, lastname, email, password));
   try {
-    // if (error) {
-    //   return res
-    //     .status(400)
-    //     .send("Please enter firstname, lastname, email, password");
-    // }
     if (
       firstname === "" &&
       lastname === "" &&
@@ -47,16 +69,24 @@ async function registerUser(req, res) {
       return res
         .status(400)
         .send("Please enter firstname, lastname, email, password");
+    } else if (firstname === "" && email === "" && password === "") {
+      return res.status(400).send("Please enter firstname, email, password");
     } else if (lastname === "" && email === "" && password === "") {
       return res.status(400).send("Please enter lastname, email, password");
+    } else if (lastname === "" && email === "") {
+      return res.status(400).send("Please enter lastname, email");
     } else if (email === "" && password === "") {
       return res.status(400).send("Please enter  email, password");
     } else if (email === "") {
       return res.status(400).send("Please enter  email");
     } else if (password === "") {
       return res.status(400).send("Please enter password");
+    } else if (firstname === "") {
+      return res.status(400).send("Please enter firstname");
+    } else if (lastname === "") {
+      return res.status(400).send("Please enter lastname");
     } else {
-      // const securePass = await bcrypt.hash(req.body.password, 10);
+      const securePass = await bcrypt.hash(req.body.password, 10);
       const meduser = await MedUsers.create({
         firstname,
         lastname,
@@ -83,6 +113,7 @@ async function registerUser(req, res) {
     // console.log("signup", err);
   }
 }
+
 // function to loguser
 async function loginUser(req, res) {
   const { email, password } = req.body;
@@ -116,7 +147,7 @@ async function loginUser(req, res) {
       return res.status(400).send("Password is incorrect");
     }
   } catch (error) {
-    res.status(400).send("User not available");
+    return res.status(400).send("User not available");
   }
 }
 
@@ -131,7 +162,7 @@ async function getUsers(req, res) {
     res.json(user);
   } catch (error) {
     console.log(error);
-    res.status(401).json({ error: "Please get authenticated first" });
+    return res.status(401).json({ error: "Please get authenticated first" });
   }
 }
 // exporting function

@@ -9,6 +9,7 @@ const routes = require("./route/routes");
 const app = express();
 
 app.use(express.json());
+
 // using routes as middleware
 app.use(routes);
 
@@ -19,7 +20,6 @@ mongoose.connection.once("open", () => {
 mongoose.connection.on("error", (err) => {
   console.log(`Error hai bhai ${err}`);
 });
-
 mongoose.connect("mongodb://localhost:27017/medical");
 
 // starting the server

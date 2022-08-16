@@ -101,7 +101,7 @@ routes.get("/mostlike", fetchUsers, getMostlike);
 routes.get("/getmedicalproduct", getmedicalproduct);
 
 // get medical product by product types
-routes.get("/getmedicalproductbytype", getmedicalproductbytype);
+routes.get("/getmedicalproductbytype/:type", getmedicalproductbytype);
 
 // update request for product
 // routes.patch("/updatecomment/:id", fetchUsers, async (req, res) => {
